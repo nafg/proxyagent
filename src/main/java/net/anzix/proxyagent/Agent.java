@@ -27,11 +27,19 @@ public class Agent {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 if (getRequestorType() == RequestorType.PROXY) {
-                    String prot = getRequestingProtocol().toLowerCase();
+                    String requestingProtocol = getRequestingProtocol();
+                    String requestingHost = getRequestingHost();
+                    if (requestingProtocol == null || requestingHost == null) {
+                        return null;
+                    }
+                    String prot = requestingProtocol.toLowerCase();
                     String host = getProperty(prot, "proxyHost");
                     String port = getProperty(prot, "proxyPort");
                     String user = getProperty(prot, "proxyUser");
                     String password = getProperty(prot, "proxyPassword");
+                    if (host.isEmpty() || port.isEmpty() || user.isEmpty() || password.isEmpty()) {
+                        return null;
+                    }
                     int proxyPort;
                     try {
                         proxyPort = Integer.parseInt(port);
@@ -39,7 +47,7 @@ public class Agent {
                         return null;
                     }
 
-                    if (getRequestingHost().toLowerCase().equals(host.toLowerCase()) &&
+                    if (requestingHost.toLowerCase().equals(host.toLowerCase()) &&
                             proxyPort == getRequestingPort()) {
                         // Seems to be OK.
                         return new PasswordAuthentication(user, password.toCharArray());
