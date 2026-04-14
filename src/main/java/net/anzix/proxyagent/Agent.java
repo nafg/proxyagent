@@ -3,6 +3,7 @@ package net.anzix.proxyagent;
 import java.lang.instrument.Instrumentation;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.security.Security;
 
 /**
  * Force to use proxyHost and proxy password parameters.
@@ -19,6 +20,7 @@ public class Agent {
     }
 
     public static void premain(String agentArgs, Instrumentation inst) {
+        Security.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
 
         // Java ignores http.proxyUser. Here comes the workaround.
         Authenticator.setDefault(new Authenticator() {
@@ -30,9 +32,15 @@ public class Agent {
                     String port = getProperty(prot, "proxyPort");
                     String user = getProperty(prot, "proxyUser");
                     String password = getProperty(prot, "proxyPassword");
+                    int proxyPort;
+                    try {
+                        proxyPort = Integer.parseInt(port);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
 
                     if (getRequestingHost().toLowerCase().equals(host.toLowerCase()) &&
-                            Integer.parseInt(port) == getRequestingPort()) {
+                            proxyPort == getRequestingPort()) {
                         // Seems to be OK.
                         return new PasswordAuthentication(user, password.toCharArray());
                     }
