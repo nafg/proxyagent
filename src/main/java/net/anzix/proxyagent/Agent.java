@@ -29,7 +29,8 @@ public class Agent {
                 if (getRequestorType() == RequestorType.PROXY) {
                     String requestingProtocol = getRequestingProtocol();
                     String requestingHost = getRequestingHost();
-                    if (requestingProtocol == null || requestingHost == null) {
+                    if (requestingProtocol == null || requestingProtocol.isEmpty() ||
+                            requestingHost == null || requestingHost.isEmpty()) {
                         return null;
                     }
                     String prot = requestingProtocol.toLowerCase();
