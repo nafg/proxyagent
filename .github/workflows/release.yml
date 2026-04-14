@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+
+      - name: Build jar
+        run: |
+          mkdir -p build/classes build/tmp
+          printf 'Manifest-Version: 1.0\nPremain-Class: net.anzix.proxyagent.Agent\n\n' > build/tmp/MANIFEST.MF
+          javac -d build/classes src/main/java/net/anzix/proxyagent/Agent.java
+          jar cfm proxyagent.jar build/tmp/MANIFEST.MF -C build/classes .
+
+      - name: Verify jar contents
+        run: |
+          jar tf proxyagent.jar | grep -q "^META-INF/MANIFEST.MF$"
+          jar tf proxyagent.jar | grep -q "^net/anzix/proxyagent/Agent.class$"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: proxyagent.jar
