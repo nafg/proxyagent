@@ -37,7 +37,8 @@ public class Agent {
                     String port = getProperty(prot, "proxyPort");
                     String user = getProperty(prot, "proxyUser");
                     String password = getProperty(prot, "proxyPassword");
-                    if (host.isEmpty() || port.isEmpty() || user.isEmpty() || password.isEmpty()) {
+                    if (host == null || host.isEmpty() || port == null || port.isEmpty() ||
+                            user == null || user.isEmpty() || password == null || password.isEmpty()) {
                         return null;
                     }
                     int proxyPort;

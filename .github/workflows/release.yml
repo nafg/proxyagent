@@ -25,11 +25,7 @@ jobs:
       - name: Build jar
         run: |
           mkdir -p build/classes build/tmp
-          cat > build/tmp/MANIFEST.MF <<'EOF'
-          Manifest-Version: 1.0
-          Premain-Class: net.anzix.proxyagent.Agent
-          
-          EOF
+          printf 'Manifest-Version: 1.0\nPremain-Class: net.anzix.proxyagent.Agent\n\n' > build/tmp/MANIFEST.MF
           javac -d build/classes src/main/java/net/anzix/proxyagent/Agent.java
           jar cfm proxyagent.jar build/tmp/MANIFEST.MF -C build/classes .
 
